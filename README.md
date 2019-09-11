@@ -2,7 +2,9 @@
 Universal logging filter for Smart Platform
 ### Usage:
  - Set debug level to DEBUG, eg.
-`<logger name="org.gaborbalazs.smartplatform.loggingfilter.filter.CustomLoggingFilter" level="DEBUG"/>`
+```$xslt
+<logger name="org.gaborbalazs.smartplatform.loggingfilter.filter.CustomLoggingFilter" level="DEBUG"/>
+```
 - Make CustomLoggingFilter visible to IoC container, eg. in Spring
 ```$xslt
 @Bean
