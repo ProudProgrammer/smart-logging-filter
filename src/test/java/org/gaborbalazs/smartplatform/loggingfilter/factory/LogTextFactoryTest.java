@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.gaborbalazs.smartplatform.loggingfilter.configuration.LogConfiguration;
 import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedRequestWrapper;
 import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedResponseWrapper;
 import org.junit.jupiter.api.Assertions;
@@ -63,15 +64,16 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogText() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(false);
-        underTest.setIncludeRequestClientInfo(false);
-        underTest.setIncludeRequestHeaders(false);
-        underTest.setIncludeRequestPayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(false);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(false);
+        logConfiguration.setIncludeRequestPayload(false);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(BASE_REQUEST, result);
@@ -80,10 +82,11 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenQueryStringAndClientInfoAndHeadersAndPayloadIncluded() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(true);
-        underTest.setIncludeRequestClientInfo(true);
-        underTest.setIncludeRequestHeaders(true);
-        underTest.setIncludeRequestPayload(true);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(true);
+        logConfiguration.setIncludeRequestClientInfo(true);
+        logConfiguration.setIncludeRequestHeaders(true);
+        logConfiguration.setIncludeRequestPayload(true);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getQueryString()).thenReturn(QUERY_STRING);
@@ -95,7 +98,7 @@ class LogTextFactoryTest {
         Mockito.when(bufferedRequestWrapper.getBody()).thenReturn(PAYLOAD);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(FULL_REQUEST, result);
@@ -104,16 +107,17 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenQueryStringIncluded() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(true);
-        underTest.setIncludeRequestClientInfo(false);
-        underTest.setIncludeRequestHeaders(false);
-        underTest.setIncludeRequestPayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(true);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(false);
+        logConfiguration.setIncludeRequestPayload(false);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getQueryString()).thenReturn(QUERY_STRING);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(QUERY_STRING_REQUEST, result);
@@ -122,16 +126,17 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenEmptyQueryStringIncluded() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(true);
-        underTest.setIncludeRequestClientInfo(false);
-        underTest.setIncludeRequestHeaders(false);
-        underTest.setIncludeRequestPayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(true);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(false);
+        logConfiguration.setIncludeRequestPayload(false);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getQueryString()).thenReturn(null);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(EMPTY_QUERY_STRING_REQUEST, result);
@@ -140,16 +145,17 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenClientInfoIncluded() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(false);
-        underTest.setIncludeRequestClientInfo(true);
-        underTest.setIncludeRequestHeaders(false);
-        underTest.setIncludeRequestPayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(false);
+        logConfiguration.setIncludeRequestClientInfo(true);
+        logConfiguration.setIncludeRequestHeaders(false);
+        logConfiguration.setIncludeRequestPayload(false);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getRemoteAddr()).thenReturn(REMOTE_ADDRESS);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(CLIENT_INFO_REQUEST, result);
@@ -158,16 +164,17 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenHeadersIncludedWithoutElement() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(false);
-        underTest.setIncludeRequestClientInfo(false);
-        underTest.setIncludeRequestHeaders(true);
-        underTest.setIncludeRequestPayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(false);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(true);
+        logConfiguration.setIncludeRequestPayload(false);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getHeaderNames()).thenReturn(Collections.emptyEnumeration());
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(HEADER_REQUEST_WITHOUT_ELEMENT, result);
@@ -176,17 +183,18 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenHeadersIncludedWithOneElement() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(false);
-        underTest.setIncludeRequestClientInfo(false);
-        underTest.setIncludeRequestHeaders(true);
-        underTest.setIncludeRequestPayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(false);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(true);
+        logConfiguration.setIncludeRequestPayload(false);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getHeaderNames()).thenReturn(Collections.enumeration(HEADER_NAMES_WITH_ONE_ELEMENT));
         Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(HEADER_REQUEST_WITH_ONE_ELEMENT, result);
@@ -195,10 +203,11 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenHeadersIncludedWithThreeElements() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(false);
-        underTest.setIncludeRequestClientInfo(false);
-        underTest.setIncludeRequestHeaders(true);
-        underTest.setIncludeRequestPayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(false);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(true);
+        logConfiguration.setIncludeRequestPayload(false);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getHeaderNames()).thenReturn(Collections.enumeration(HEADER_NAMES_WITH_THREE_ELEMENTS));
@@ -207,7 +216,7 @@ class LogTextFactoryTest {
         Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(HEADER_REQUEST_WITH_THREE_ELEMENTS, result);
@@ -216,16 +225,17 @@ class LogTextFactoryTest {
     @Test
     void testCreateRequestLogTextWhenPayloadIncluded() {
         // GIVEN
-        underTest.setIncludeRequestQueryString(false);
-        underTest.setIncludeRequestClientInfo(false);
-        underTest.setIncludeRequestHeaders(false);
-        underTest.setIncludeRequestPayload(true);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(false);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(false);
+        logConfiguration.setIncludeRequestPayload(true);
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getBody()).thenReturn(PAYLOAD);
 
         // WHEN
-        String result = underTest.createRequestLogText(bufferedRequestWrapper);
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(PAYLOAD_REQUEST, result);
@@ -234,11 +244,12 @@ class LogTextFactoryTest {
     @Test
     void testCreateResponseLogText() {
         // GIVEN
-        underTest.setIncludeResponseHeaders(false);
-        underTest.setIncludeResponsePayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeResponseHeaders(false);
+        logConfiguration.setIncludeResponsePayload(false);
 
         // WHEN
-        String result = underTest.createResponseLogText(bufferedResponseWrapper);
+        String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(BASE_RESPONSE, result);
@@ -247,8 +258,9 @@ class LogTextFactoryTest {
     @Test
     void testCreateResponseLogTextWhenHeadersAndPayloadIncluded() {
         // GIVEN
-        underTest.setIncludeResponseHeaders(true);
-        underTest.setIncludeResponsePayload(true);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeResponseHeaders(true);
+        logConfiguration.setIncludeResponsePayload(true);
         Mockito.when(bufferedResponseWrapper.getHeaderNames()).thenReturn(HEADER_NAMES_WITH_THREE_ELEMENTS);
         Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
         Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
@@ -256,7 +268,7 @@ class LogTextFactoryTest {
         Mockito.when(bufferedResponseWrapper.getBody()).thenReturn(PAYLOAD);
 
         // WHEN
-        String result = underTest.createResponseLogText(bufferedResponseWrapper);
+        String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(FULL_RESPONSE, result);
@@ -265,12 +277,13 @@ class LogTextFactoryTest {
     @Test
     void testCreateResponseLogTextWhenHeadersIncludedWithoutElement() {
         // GIVEN
-        underTest.setIncludeResponseHeaders(true);
-        underTest.setIncludeResponsePayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeResponseHeaders(true);
+        logConfiguration.setIncludeResponsePayload(false);
         Mockito.when(bufferedResponseWrapper.getHeaderNames()).thenReturn(HEADER_NAMES_WITHOUT_ELEMENT);
 
         // WHEN
-        String result = underTest.createResponseLogText(bufferedResponseWrapper);
+        String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(HEADER_RESPONSE_WITHOUT_ELEMENT, result);
@@ -279,13 +292,14 @@ class LogTextFactoryTest {
     @Test
     void testCreateResponseLogTextWhenHeadersIncludedWithOneElement() {
         // GIVEN
-        underTest.setIncludeResponseHeaders(true);
-        underTest.setIncludeResponsePayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeResponseHeaders(true);
+        logConfiguration.setIncludeResponsePayload(false);
         Mockito.when(bufferedResponseWrapper.getHeaderNames()).thenReturn(HEADER_NAMES_WITH_ONE_ELEMENT);
         Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
 
         // WHEN
-        String result = underTest.createResponseLogText(bufferedResponseWrapper);
+        String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(HEADER_RESPONSE_WITH_ONE_ELEMENT, result);
@@ -294,15 +308,16 @@ class LogTextFactoryTest {
     @Test
     void testCreateResponseLogTextWhenHeadersIncludedWithThreeElements() {
         // GIVEN
-        underTest.setIncludeResponseHeaders(true);
-        underTest.setIncludeResponsePayload(false);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeResponseHeaders(true);
+        logConfiguration.setIncludeResponsePayload(false);
         Mockito.when(bufferedResponseWrapper.getHeaderNames()).thenReturn(HEADER_NAMES_WITH_THREE_ELEMENTS);
         Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
         Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
         Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
 
         // WHEN
-        String result = underTest.createResponseLogText(bufferedResponseWrapper);
+        String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(HEADER_RESPONSE_WITH_THREE_ELEMENTS, result);
@@ -311,12 +326,13 @@ class LogTextFactoryTest {
     @Test
     void testCreateResponseLogTextWhenPayloadIncluded() {
         // GIVEN
-        underTest.setIncludeResponseHeaders(false);
-        underTest.setIncludeResponsePayload(true);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeResponseHeaders(false);
+        logConfiguration.setIncludeResponsePayload(true);
         Mockito.when(bufferedResponseWrapper.getBody()).thenReturn(PAYLOAD);
 
         // WHEN
-        String result = underTest.createResponseLogText(bufferedResponseWrapper);
+        String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(PAYLOAD_RESPONSE, result);

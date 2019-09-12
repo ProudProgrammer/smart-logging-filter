@@ -143,8 +143,8 @@ fabric.properties
 
 ### NetBeans ###
 
-# NetBeans project configuration files
-nb-configuration.xml
+# NetBeans project logConfiguration files
+nb-logConfiguration.xml
 
 ### Log files ###
 *.log

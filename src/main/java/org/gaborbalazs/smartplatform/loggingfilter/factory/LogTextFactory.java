@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.gaborbalazs.smartplatform.loggingfilter.configuration.LogConfiguration;
 import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedRequestWrapper;
 import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedResponseWrapper;
 
@@ -15,116 +16,60 @@ import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedResponseWrapp
  */
 public class LogTextFactory {
 
-    private static final String DEFAULT_REQUEST_MESSAGE_PREFIX = "Incoming request [";
-    private static final String DEFAULT_REQUEST_MESSAGE_SUFFIX = "]";
-
-    private static final String DEFAULT_RESPONSE_MESSAGE_PREFIX = "Outgoing response [";
-    private static final String DEFAULT_RESPONSE_MESSAGE_SUFFIX = "]";
-
-    private boolean includeRequestQueryString = true;
-    private boolean includeRequestClientInfo = true;
-    private boolean includeRequestHeaders = true;
-    private boolean includeRequestPayload = true;
-    private String requestMessagePrefix = DEFAULT_REQUEST_MESSAGE_PREFIX;
-    private String requestMessageSuffix = DEFAULT_REQUEST_MESSAGE_SUFFIX;
-
-    private boolean includeResponseHeaders = true;
-    private boolean includeResponsePayload = true;
-    private String responseMessagePrefix = DEFAULT_RESPONSE_MESSAGE_PREFIX;
-    private String responseMessageSuffix = DEFAULT_RESPONSE_MESSAGE_SUFFIX;
-
     /**
      * Creator method for request log text.
      *
-     * @param requestWrapper {@link BufferedRequestWrapper}
+     * @param request {@link HttpServletRequest} or {@link BufferedRequestWrapper} depends on payload
+     * @param logConfiguration is logConfiguration holder
      * @return request log text
      */
-    public String createRequestLogText(BufferedRequestWrapper requestWrapper) {
-        StringBuilder logBuilder = new StringBuilder(requestMessagePrefix);
-        injectMethod(requestWrapper, logBuilder);
+    public <T extends HttpServletRequest> String createRequestLogText(T request, LogConfiguration logConfiguration) {
+        StringBuilder logBuilder = new StringBuilder(logConfiguration.getRequestMessagePrefix());
+        injectMethod(request, logBuilder);
         injectSeparator(logBuilder, true);
-        injectUri(requestWrapper, logBuilder);
-        if (includeRequestQueryString) {
+        injectUri(request, logBuilder);
+        if (logConfiguration.isIncludeRequestQueryString()) {
             injectSeparator(logBuilder, true);
-            injectQueryString(requestWrapper, logBuilder);
+            injectQueryString(request, logBuilder);
         }
-        if (includeRequestClientInfo) {
+        if (logConfiguration.isIncludeRequestClientInfo()) {
             injectSeparator(logBuilder, true);
-            injectClientInfo(requestWrapper, logBuilder);
+            injectClientInfo(request, logBuilder);
         }
-        if (includeRequestHeaders) {
+        if (logConfiguration.isIncludeRequestHeaders()) {
             injectSeparator(logBuilder, true);
-            Map<String, String> headers = createHeadersMap(requestWrapper);
+            Map<String, String> headers = createHeadersMap(request);
             injectHeaders(headers, logBuilder);
         }
-        if (includeRequestPayload) {
+        if (logConfiguration.isIncludeRequestPayload()) {
             injectSeparator(logBuilder, true);
-            injectBody(logBuilder, requestWrapper.getBody());
+            injectBody(logBuilder, ((BufferedRequestWrapper) request).getBody());
         }
-        logBuilder.append(requestMessageSuffix);
+        logBuilder.append(logConfiguration.getRequestMessageSuffix());
         return logBuilder.toString();
     }
 
     /**
      * Creator method for response log text.
      *
-     * @param responseWrapper {@link BufferedResponseWrapper}
+     * @param response {@link HttpServletResponse} or {@link BufferedResponseWrapper} depends on payload
+     * @param logConfiguration is logConfiguration holder
      * @return response log text
      */
-    public String createResponseLogText(BufferedResponseWrapper responseWrapper) {
+    public <T extends HttpServletResponse> String createResponseLogText(T response, LogConfiguration logConfiguration) {
         boolean includedSomething = false;
-        StringBuilder logBuilder = new StringBuilder(responseMessagePrefix);
-        if (includeResponseHeaders) {
+        StringBuilder logBuilder = new StringBuilder(logConfiguration.getResponseMessagePrefix());
+        if (logConfiguration.isIncludeResponseHeaders()) {
             includedSomething = true;
-            Map<String, String> headers = createHeadersMap(responseWrapper);
+            Map<String, String> headers = createHeadersMap(response);
             injectHeaders(headers, logBuilder);
         }
-        if (includeResponsePayload) {
+        if (logConfiguration.isIncludeResponsePayload()) {
             injectSeparator(logBuilder, includedSomething);
-            injectBody(logBuilder, responseWrapper.getBody());
+            injectBody(logBuilder, ((BufferedResponseWrapper) response).getBody());
         }
-        logBuilder.append(responseMessageSuffix);
+        logBuilder.append(logConfiguration.getResponseMessageSuffix());
         return logBuilder.toString();
-    }
-
-    public void setIncludeRequestQueryString(boolean includeRequestQueryString) {
-        this.includeRequestQueryString = includeRequestQueryString;
-    }
-
-    public void setIncludeRequestClientInfo(boolean includeRequestClientInfo) {
-        this.includeRequestClientInfo = includeRequestClientInfo;
-    }
-
-    public void setIncludeRequestHeaders(boolean includeRequestHeaders) {
-        this.includeRequestHeaders = includeRequestHeaders;
-    }
-
-    public void setIncludeRequestPayload(boolean includeRequestPayload) {
-        this.includeRequestPayload = includeRequestPayload;
-    }
-
-    public void setRequestMessagePrefix(String requestMessagePrefix) {
-        this.requestMessagePrefix = requestMessagePrefix;
-    }
-
-    public void setRequestMessageSuffix(String requestMessageSuffix) {
-        this.requestMessageSuffix = requestMessageSuffix;
-    }
-
-    public void setIncludeResponseHeaders(boolean includeResponseHeaders) {
-        this.includeResponseHeaders = includeResponseHeaders;
-    }
-
-    public void setIncludeResponsePayload(boolean includeResponsePayload) {
-        this.includeResponsePayload = includeResponsePayload;
-    }
-
-    public void setResponseMessagePrefix(String responseMessagePrefix) {
-        this.responseMessagePrefix = responseMessagePrefix;
-    }
-
-    public void setResponseMessageSuffix(String responseMessageSuffix) {
-        this.responseMessageSuffix = responseMessageSuffix;
     }
 
     private void injectSeparator(StringBuilder logBuilder, boolean includedSomething) {
