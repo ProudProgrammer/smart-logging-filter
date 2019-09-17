@@ -29,5 +29,5 @@ logConfiguration.setIncludeResponsePayload(true);
 logConfiguration.setResponseMessagePrefix("Outgoing response [");
 logConfiguration.setResponseMessageSuffix("]);
 ```
-### System Architecture
+### System architecture of Smart Platform
 ![System Architecture](https://raw.githubusercontent.com/ProudProgrammer/smart-tools/master/plantuml/system-architecture.png)
