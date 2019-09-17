@@ -1,6 +1,6 @@
 # Smart Platform - Logging Filter
 Universal logging filter for Smart Platform
-### Usage:
+### Usage
  - Set debug level to DEBUG, eg.
 ```
 <logger name="org.gaborbalazs.smartplatform.loggingfilter.filter.CustomLoggingFilter" level="DEBUG"/>
@@ -14,7 +14,7 @@ CustomLoggingFilter customLoggingFilter() {
     return customLoggingFilter;
 }
 ```
-### Default settings:
+### Default settings
 ```
 logConfiguration.setLogRequest(true);
 logConfiguration.setLogResponse(true);
@@ -29,3 +29,5 @@ logConfiguration.setIncludeResponsePayload(true);
 logConfiguration.setResponseMessagePrefix("Outgoing response [");
 logConfiguration.setResponseMessageSuffix("]);
 ```
+### System Architecture
+![System Architecture](https://raw.githubusercontent.com/ProudProgrammer/smart-tools/master/plantuml/system-architecture.png)
