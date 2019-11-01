@@ -3,6 +3,7 @@ package org.gaborbalazs.smartplatform.loggingfilter.factory;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,9 +104,9 @@ public class LogTextFactory {
         logBuilder.append("headers=[");
         headers.forEach((key, value) -> {
             logBuilder.append(key);
-            logBuilder.append(":\"");
+            logBuilder.append(":");
             logBuilder.append(value);
-            logBuilder.append("\", ");
+            logBuilder.append(", ");
         });
         if (logBuilder.charAt(logBuilder.length() - 2) == ',') {
             logBuilder.delete(logBuilder.length() - 2, logBuilder.length());
@@ -119,19 +120,24 @@ public class LogTextFactory {
     }
 
     private Map<String, String> createHeadersMap(HttpServletRequest request) {
-        Map<String, String> headers = new LinkedHashMap<>();
+        Map<String, String> headersMap = new LinkedHashMap<>();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
-            String header = request.getHeader(headerName);
-            headers.put(headerName, header);
+            Enumeration<String> headers = request.getHeaders(headerName);
+            String headersLine = "";
+            while (headers.hasMoreElements()) {
+                String header = headers.nextElement();
+                headersLine = headersLine.equals("") ? (headersLine + "\"" + header + "\"") : (headersLine + ";\"" + header + "\"");
+            }
+            headersMap.put(headerName, headersLine);
         }
-        return headers;
+        return headersMap;
     }
 
     private Map<String, String> createHeadersMap(HttpServletResponse response) {
         Map<String, String> headers = new LinkedHashMap<>();
-        response.getHeaderNames().forEach(headerName -> headers.put(headerName, response.getHeader(headerName)));
+        response.getHeaderNames().forEach(headerName -> headers.put(headerName, response.getHeaders(headerName).stream().map(header -> "\"" + header + "\"").collect(Collectors.joining(";"))));
         return headers;
     }
 }

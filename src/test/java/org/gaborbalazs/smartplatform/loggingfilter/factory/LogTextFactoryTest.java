@@ -23,9 +23,10 @@ class LogTextFactoryTest {
     private static final String HEADER_NAME_1 = "header1";
     private static final String HEADER_NAME_2 = "header2";
     private static final String HEADER_NAME_3 = "header3";
-    private static final String HEADER_VALUE_1 = "value1";
-    private static final String HEADER_VALUE_2 = "value2";
-    private static final String HEADER_VALUE_3 = "value3";
+    private static final Collection<String> HEADER_VALUE_1 = List.of("value1");
+    private static final Collection<String> HEADER_VALUE_2 = List.of("value2");
+    private static final Collection<String> HEADER_VALUE_3 = List.of("value3");
+    private static final Collection<String> HEADER_VALUE_4 = List.of("value1", "value2", "value3");
     private static final Collection<String> HEADER_NAMES_WITH_THREE_ELEMENTS = List.of(HEADER_NAME_1, HEADER_NAME_2, HEADER_NAME_3);
     private static final Collection<String> HEADER_NAMES_WITH_ONE_ELEMENT = List.of(HEADER_NAME_1);
     private static final Collection<String> HEADER_NAMES_WITHOUT_ELEMENT = Collections.emptyList();
@@ -42,6 +43,7 @@ class LogTextFactoryTest {
     private static final String HEADER_REQUEST_WITHOUT_ELEMENT = "Incoming request [method=POST; uri=test\\test; headers=[]]";
     private static final String HEADER_REQUEST_WITH_ONE_ELEMENT = "Incoming request [method=POST; uri=test\\test; headers=[header1:\"value1\"]]";
     private static final String HEADER_REQUEST_WITH_THREE_ELEMENTS = "Incoming request [method=POST; uri=test\\test; headers=[header1:\"value1\", header2:\"value2\", header3:\"value3\"]]";
+    private static final String HEADER_REQUEST_WITH_ONE_ELEMENT_WITH_THREEE_VALUES = "Incoming request [method=POST; uri=test\\test; headers=[header1:\"value1\";\"value2\";\"value3\"]]";
     private static final String PAYLOAD_REQUEST = "Incoming request [method=POST; uri=test\\test; payload={\"name1\":\"value1\",\"name2\":\"value2\"}]";
 
     private static final String BASE_RESPONSE = "Outgoing response []";
@@ -92,9 +94,9 @@ class LogTextFactoryTest {
         Mockito.when(bufferedRequestWrapper.getQueryString()).thenReturn(QUERY_STRING);
         Mockito.when(bufferedRequestWrapper.getRemoteAddr()).thenReturn(REMOTE_ADDRESS);
         Mockito.when(bufferedRequestWrapper.getHeaderNames()).thenReturn(Collections.enumeration(HEADER_NAMES_WITH_THREE_ELEMENTS));
-        Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
-        Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
-        Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_1)).thenReturn(Collections.enumeration(HEADER_VALUE_1));
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_2)).thenReturn(Collections.enumeration(HEADER_VALUE_2));
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_3)).thenReturn(Collections.enumeration(HEADER_VALUE_3));
         Mockito.when(bufferedRequestWrapper.getBody()).thenReturn(PAYLOAD);
 
         // WHEN
@@ -191,13 +193,33 @@ class LogTextFactoryTest {
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getHeaderNames()).thenReturn(Collections.enumeration(HEADER_NAMES_WITH_ONE_ELEMENT));
-        Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_1)).thenReturn(Collections.enumeration(HEADER_VALUE_1));
 
         // WHEN
         String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
 
         // THEN
         Assertions.assertEquals(HEADER_REQUEST_WITH_ONE_ELEMENT, result);
+    }
+
+    @Test
+    void testCreateRequestLogTextWhenHeadersIncludedWithOneElementWithThreeValues() {
+        // GIVEN
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setIncludeRequestQueryString(false);
+        logConfiguration.setIncludeRequestClientInfo(false);
+        logConfiguration.setIncludeRequestHeaders(true);
+        logConfiguration.setIncludeRequestPayload(false);
+        Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
+        Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
+        Mockito.when(bufferedRequestWrapper.getHeaderNames()).thenReturn(Collections.enumeration(HEADER_NAMES_WITH_ONE_ELEMENT));
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_1)).thenReturn(Collections.enumeration(HEADER_VALUE_4));
+
+        // WHEN
+        String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
+
+        // THEN
+        Assertions.assertEquals(HEADER_REQUEST_WITH_ONE_ELEMENT_WITH_THREEE_VALUES, result);
     }
 
     @Test
@@ -211,9 +233,9 @@ class LogTextFactoryTest {
         Mockito.when(bufferedRequestWrapper.getMethod()).thenReturn(METHOD);
         Mockito.when(bufferedRequestWrapper.getRequestURI()).thenReturn(REQUEST_URI);
         Mockito.when(bufferedRequestWrapper.getHeaderNames()).thenReturn(Collections.enumeration(HEADER_NAMES_WITH_THREE_ELEMENTS));
-        Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
-        Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
-        Mockito.when(bufferedRequestWrapper.getHeader(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_1)).thenReturn(Collections.enumeration(HEADER_VALUE_1));
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_2)).thenReturn(Collections.enumeration(HEADER_VALUE_2));
+        Mockito.when(bufferedRequestWrapper.getHeaders(HEADER_NAME_3)).thenReturn(Collections.enumeration(HEADER_VALUE_3));
 
         // WHEN
         String result = underTest.createRequestLogText(bufferedRequestWrapper, logConfiguration);
@@ -262,9 +284,9 @@ class LogTextFactoryTest {
         logConfiguration.setIncludeResponseHeaders(true);
         logConfiguration.setIncludeResponsePayload(true);
         Mockito.when(bufferedResponseWrapper.getHeaderNames()).thenReturn(HEADER_NAMES_WITH_THREE_ELEMENTS);
-        Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
-        Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
-        Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
+        Mockito.when(bufferedResponseWrapper.getHeaders(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
+        Mockito.when(bufferedResponseWrapper.getHeaders(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
+        Mockito.when(bufferedResponseWrapper.getHeaders(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
         Mockito.when(bufferedResponseWrapper.getBody()).thenReturn(PAYLOAD);
 
         // WHEN
@@ -296,7 +318,7 @@ class LogTextFactoryTest {
         logConfiguration.setIncludeResponseHeaders(true);
         logConfiguration.setIncludeResponsePayload(false);
         Mockito.when(bufferedResponseWrapper.getHeaderNames()).thenReturn(HEADER_NAMES_WITH_ONE_ELEMENT);
-        Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
+        Mockito.when(bufferedResponseWrapper.getHeaders(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
 
         // WHEN
         String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
@@ -312,9 +334,9 @@ class LogTextFactoryTest {
         logConfiguration.setIncludeResponseHeaders(true);
         logConfiguration.setIncludeResponsePayload(false);
         Mockito.when(bufferedResponseWrapper.getHeaderNames()).thenReturn(HEADER_NAMES_WITH_THREE_ELEMENTS);
-        Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
-        Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
-        Mockito.when(bufferedResponseWrapper.getHeader(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
+        Mockito.when(bufferedResponseWrapper.getHeaders(HEADER_NAME_1)).thenReturn(HEADER_VALUE_1);
+        Mockito.when(bufferedResponseWrapper.getHeaders(HEADER_NAME_2)).thenReturn(HEADER_VALUE_2);
+        Mockito.when(bufferedResponseWrapper.getHeaders(HEADER_NAME_3)).thenReturn(HEADER_VALUE_3);
 
         // WHEN
         String result = underTest.createResponseLogText(bufferedResponseWrapper, logConfiguration);
