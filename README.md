@@ -1,5 +1,9 @@
 # Smart Platform - Logging Filter
 Universal logging filter for Smart Platform
+### Maven profiles
+```
+Without tests: mvn clean install -Pfast
+```
 ### Usage
  - Set debug level to DEBUG, eg.
 ```
@@ -30,4 +34,8 @@ logConfiguration.setResponseMessagePrefix("Outgoing response [");
 logConfiguration.setResponseMessageSuffix("]);
 ```
 ### System architecture of Smart Platform
+Applied software development techniques:
+- Microservice Architecture
+- API Gateway Pattern
+
 ![System Architecture](https://raw.githubusercontent.com/ProudProgrammer/smart-tools/master/plantuml/system-architecture.png)
