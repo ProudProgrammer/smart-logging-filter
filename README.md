@@ -33,7 +33,7 @@ logConfiguration.setIncludeResponsePayload(true);
 logConfiguration.setResponseMessagePrefix("Outgoing response [");
 logConfiguration.setResponseMessageSuffix("]);
 ```
-### Consumers
+### Dependants
 - https://github.com/ProudProgrammer/smart-lottery-service
 - https://github.com/ProudProgrammer/smart-edge-service
 ### System architecture of Smart Platform
