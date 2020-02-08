@@ -1,16 +1,15 @@
 package org.gaborbalazs.smartplatform.loggingfilter.factory;
 
+import org.gaborbalazs.smartplatform.loggingfilter.configuration.LogConfiguration;
+import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedRequestWrapper;
+import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedResponseWrapper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.gaborbalazs.smartplatform.loggingfilter.configuration.LogConfiguration;
-import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedRequestWrapper;
-import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedResponseWrapper;
 
 /**
  * Factory for request and response log texts.
@@ -20,30 +19,30 @@ public class LogTextFactory {
     /**
      * Creator method for request log text.
      *
-     * @param request {@link HttpServletRequest} or {@link BufferedRequestWrapper} depends on payload
+     * @param request          {@link HttpServletRequest} or {@link BufferedRequestWrapper} depends on payload
      * @param logConfiguration is logConfiguration holder
      * @return request log text
      */
     public <T extends HttpServletRequest> String createRequestLogText(T request, LogConfiguration logConfiguration) {
         StringBuilder logBuilder = new StringBuilder(logConfiguration.getRequestMessagePrefix());
         injectMethod(request, logBuilder);
-        injectSeparator(logBuilder, true);
+        injectSeparator(logBuilder);
         injectUri(request, logBuilder);
         if (logConfiguration.isIncludeRequestQueryString()) {
-            injectSeparator(logBuilder, true);
+            injectSeparator(logBuilder);
             injectQueryString(request, logBuilder);
         }
         if (logConfiguration.isIncludeRequestClientInfo()) {
-            injectSeparator(logBuilder, true);
+            injectSeparator(logBuilder);
             injectClientInfo(request, logBuilder);
         }
         if (logConfiguration.isIncludeRequestHeaders()) {
-            injectSeparator(logBuilder, true);
+            injectSeparator(logBuilder);
             Map<String, String> headers = createHeadersMap(request);
             injectHeaders(headers, logBuilder);
         }
         if (logConfiguration.isIncludeRequestPayload()) {
-            injectSeparator(logBuilder, true);
+            injectSeparator(logBuilder);
             injectBody(logBuilder, ((BufferedRequestWrapper) request).getBody());
         }
         logBuilder.append(logConfiguration.getRequestMessageSuffix());
@@ -53,30 +52,33 @@ public class LogTextFactory {
     /**
      * Creator method for response log text.
      *
-     * @param response {@link HttpServletResponse} or {@link BufferedResponseWrapper} depends on payload
+     * @param response         {@link HttpServletResponse} or {@link BufferedResponseWrapper} depends on payload
      * @param logConfiguration is logConfiguration holder
      * @return response log text
      */
     public <T extends HttpServletResponse> String createResponseLogText(T response, LogConfiguration logConfiguration) {
-        boolean includedSomething = false;
         StringBuilder logBuilder = new StringBuilder(logConfiguration.getResponseMessagePrefix());
+        injectHttpStatus(response, logBuilder);
         if (logConfiguration.isIncludeResponseHeaders()) {
-            includedSomething = true;
+            injectSeparator(logBuilder);
             Map<String, String> headers = createHeadersMap(response);
             injectHeaders(headers, logBuilder);
         }
         if (logConfiguration.isIncludeResponsePayload()) {
-            injectSeparator(logBuilder, includedSomething);
+            injectSeparator(logBuilder);
             injectBody(logBuilder, ((BufferedResponseWrapper) response).getBody());
         }
         logBuilder.append(logConfiguration.getResponseMessageSuffix());
         return logBuilder.toString();
     }
 
-    private void injectSeparator(StringBuilder logBuilder, boolean includedSomething) {
-        if (includedSomething) {
-            logBuilder.append("; ");
-        }
+    private void injectSeparator(StringBuilder logBuilder) {
+        logBuilder.append("; ");
+    }
+
+    private void injectHttpStatus(HttpServletResponse response, StringBuilder logBuilder) {
+        logBuilder.append("status-code=");
+        logBuilder.append(response.getStatus());
     }
 
     private void injectMethod(HttpServletRequest request, StringBuilder logBuilder) {
