@@ -1,10 +1,10 @@
 package org.gaborbalazs.smartplatform.loggingfilter.io;
 
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
 
 /**
  * InputStream for holding ServletRequest body as stream.
