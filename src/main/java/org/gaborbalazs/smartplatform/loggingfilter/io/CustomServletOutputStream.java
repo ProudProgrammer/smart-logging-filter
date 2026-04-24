@@ -1,10 +1,10 @@
 package org.gaborbalazs.smartplatform.loggingfilter.io;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+
 import java.io.IOException;
 import java.io.OutputStream;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 
 /**
  * OutputStream for buffering servlet response body.

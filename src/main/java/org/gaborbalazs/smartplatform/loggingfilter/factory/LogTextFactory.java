@@ -1,11 +1,11 @@
 package org.gaborbalazs.smartplatform.loggingfilter.factory;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.gaborbalazs.smartplatform.loggingfilter.configuration.LogConfiguration;
 import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedRequestWrapper;
 import org.gaborbalazs.smartplatform.loggingfilter.wrapper.BufferedResponseWrapper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -130,7 +130,7 @@ public class LogTextFactory {
             String headersLine = "";
             while (headers.hasMoreElements()) {
                 String header = headers.nextElement();
-                headersLine = headersLine.equals("") ? (headersLine + "\"" + header + "\"") : (headersLine + ";\"" + header + "\"");
+                headersLine = headersLine.isEmpty() ? (headersLine + "\"" + header + "\"") : (headersLine + ";\"" + header + "\"");
             }
             headersMap.put(headerName, headersLine);
         }
